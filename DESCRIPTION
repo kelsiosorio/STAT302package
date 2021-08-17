@@ -1,0 +1,14 @@
+Package: STAT302package
+Title: STAT302 Package
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Kelsi",
+           family = "Osorio",
+           role = c("aut", "cre"),
+           email = "kelsio3101@gmail.com")
+Description: This is a package for Stat 302.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
