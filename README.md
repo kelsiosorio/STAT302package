@@ -16,6 +16,8 @@ You can install the released version of STAT302package from GitHub using:
 devtools::install_github("kelsiosorio/STAT302package")
 ```
 
+## Use
+
 To view vignettes, run the following code:
 
 ```{r}
