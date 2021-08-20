@@ -1,10 +1,27 @@
-#' Power function
+#' Linear model function
 #'
+#' This function fits a linear model.
+#'
+#' @param formula A \code{formula} class object.
+#' @param data Input a data frame.
+#'
+#' @return A table with rows for each coefficient (including Intercept), and columns
+#'   for the Estimate, Standard Error, t value, and Pr(>|t|).
+#'
+#' @examples
+#' # Generating data for example
+#' my_data <- data.frame("x" = c(4.17, 5.58, 5.18, 6.11, 4.50, 4.61, 5.17, 4.53, 5.33, 5.14),
+#' "y" = c(5.34, 6.78, 4.78, 8.45, 5.81, 6.24, 6.93, 5.88, 6.46, 7.12))
+#'
+#' # Fitting model
+#' my_lm(x ~ y, data = my_data)
+#'
+#' @export
 my_lm <- function(formula, data) {
   # creating matrices
-  mat_x <- model.matrix(formula, data)
-  mod_mat <- model.frame(formula, data)
-  mat_y <- model.response(mod_mat)
+  mat_x <- stats::model.matrix(formula, data)
+  mod_mat <- stats::model.frame(formula, data)
+  mat_y <- stats::model.response(mod_mat)
   # calculating estimates
   b_hat <- solve(t(mat_x) %*% mat_x) %*% t(mat_x) %*% mat_y
   # creating first column in table
@@ -23,10 +40,12 @@ my_lm <- function(formula, data) {
   table1$t_value <- test_stat
   # calculating Pr(>|t|), two sided t-test
   ab_test_stat <- abs(test_stat)
-  pr <- 2 * pt(ab_test_stat, df, lower.tail = FALSE)
+  pr <- 2 * stats::pt(ab_test_stat, df, lower.tail = FALSE)
   # adding Pr(>|t|) to table
   table1$pr <- pr
   # re-naming columns
   colnames(table1) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
   return(table1)
 }
+
+

@@ -2,10 +2,28 @@
 % Please edit documentation in R/my_lm.R
 \name{my_lm}
 \alias{my_lm}
-\title{Power function}
+\title{Linear model function}
 \usage{
 my_lm(formula, data)
 }
+\arguments{
+\item{formula}{A \code{formula} class object.}
+
+\item{data}{Input a data frame.}
+}
+\value{
+A table with rows for each coefficient (including Intercept), and columns
+for the Estimate, Standard Error, t value, and Pr(>|t|).
+}
 \description{
-Power function
+This function fits a linear model.
+}
+\examples{
+# Generating data for example
+my_data <- data.frame("x" = c(4.17, 5.58, 5.18, 6.11, 4.50, 4.61, 5.17, 4.53, 5.33, 5.14),
+"y" = c(5.34, 6.78, 4.78, 8.45, 5.81, 6.24, 6.93, 5.88, 6.46, 7.12))
+
+# Fitting model
+my_lm(x ~ y, data = my_data)
+
 }
