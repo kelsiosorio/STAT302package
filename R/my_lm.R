@@ -4,6 +4,7 @@
 #'
 #' @param formula A \code{formula} class object.
 #' @param data Input a data frame.
+#' @keywords inference prediction
 #'
 #' @return A table with rows for each coefficient (including Intercept), and columns
 #'   for the Estimate, Standard Error, t value, and Pr(>|t|).
