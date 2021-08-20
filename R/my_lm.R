@@ -1,3 +1,5 @@
+#' Power function
+#'
 my_lm <- function(formula, data) {
   # creating matrices
   mat_x <- model.matrix(formula, data)

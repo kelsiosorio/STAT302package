@@ -1,4 +1,4 @@
-#' my_t_test function
+#' t-test function
 #'
 #' This function performs one sample t-test.
 #'
