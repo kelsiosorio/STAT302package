@@ -55,7 +55,8 @@ my_t.test <- function(x, alternative, mu) {
     my_t_list$p_val <- p_val
   } else {
     # message for when alt input is not one of the acceptable three
-    return(paste("The alternative input must be less, greater, or two.sided!"))
+    message("*alternative* input must be less, greater, or two.sided!")
+    return(alternative)
   }
   return(my_t_list)
 }

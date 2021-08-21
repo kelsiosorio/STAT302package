@@ -7,8 +7,11 @@ my_data <- data.frame("x" = c(4.17, 5.58, 5.18, 6.11, 4.50, 4.61, 5.17, 4.53, 5.
 #Fitting model
 data_lm <- my_lm(x ~ y, data = my_data)
 
-test_that("Expecting data frame", {
+test_that("Expecting List", {
   expect_type(data_lm, "list")
-  expect_type(data_lm[1, 1], "double")
 })
 
+
+test_that("Numeric outputs", {
+  expect_type(data_lm[1, 1], "double")
+})
