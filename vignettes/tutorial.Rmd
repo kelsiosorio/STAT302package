@@ -15,6 +15,21 @@ knitr::opts_chunk$set(
 )
 ```
 
+# Introduction
+
+This package is a compilation of functions that run some statistical inferences and predictions that we have learned over the course of this class. The STAT302package includes functions my_t.test(), my_lm(), my_knn_cv, and my_rf_cv, as well as two sets of data my_penguins and my_gapminder from the gapminder and palmerpenguins packages. For statistical inference we have the function my_t.test that performs a one sample t-test and my_lm fits a linear model. For statistical prediction, other than my_lm, it has the my_knn_cv function that predicts an output class using covariates, and my_rf_cv, specific to the my_penguins data, which predicts output body_mass_g using covariates bill_length_mm, bill_depth_mm, and flipper_length_mm. In this vignette we will be using that data in order to demonstrate what this functions can do. 
+
+Install STAT302package using:
+```{r, eval = FALSE}
+devtools::install_github("kelsiosorio/STAT302package")
+```
+
 ```{r setup}
 library(STAT302package)
 ```
+
+# my_t.test Tutorial 
+
+
+
+
