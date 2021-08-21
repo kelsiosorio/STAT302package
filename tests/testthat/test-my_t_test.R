@@ -9,6 +9,8 @@ ran_test <- my_t.test(x = random_vec, "two.sided", mu = 3)
 
 test_that("Expecting List", {
   expect_type(ran_test, "list")
+  expect_type(my_t.test(x = random_vec, "less", mu = 3), "list")
+  expect_type(my_t.test(x = random_vec, "greater", mu = 3), "list")
 })
 
 test_that("Correct outputs in the list", {
