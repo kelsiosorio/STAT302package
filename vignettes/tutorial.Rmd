@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-This package is a compilation of functions that run some statistical inferences and predictions that we have learned over the course of this class. The STAT302package includes functions my_t.test(), my_lm(), my_knn_cv, and my_rf_cv, as well as two sets of data my_penguins and my_gapminder from the gapminder and palmerpenguins packages. For statistical inference, we have the function my_t.test that performs a one sample t-test and my_lm fits a linear model. For statistical prediction, other than my_lm, it has the my_knn_cv function that predicts an output class using covariates, and my_rf_cv, specific to the my_penguins data, which predicts output body_mass_g using covariates bill_length_mm, bill_depth_mm, and flipper_length_mm. In this vignette we will be using that data in order to demonstrate what these functions can do. 
+This package is a compilation of functions that run some statistical inferences and predictions that we have learned over the course of this class. The STAT302package includes functions my_t.test(), my_lm(), my_knn_cv, and my_rf_cv, as well as two sets of data my_penguins and my_gapminder from the gapminder and palmerpenguins packages. For statistical inference, we have the function my_t.test that performs a one sample t-test and my_lm fits a linear model. For statistical prediction, other than my_lm, it has the my_knn_cv function that predicts an output class using covariates, and my_rf_cv, specific to the my_penguins data, which predicts output body_mass_g using covariates bill_length_mm, bill_depth_mm, and flipper_length_mm. In this vignette, we will be using that data in order to demonstrate what these functions can do. 
 
 Install STAT302package using:
 ```{r, eval = FALSE}
@@ -46,7 +46,7 @@ life_exp <- my_gapminder %>% pull(lifeExp)
 my_t.test(x = life_exp, alternative = "two.sided", mu = 60)
 ```
 
-With a p-value cut-off of $\alpha = 0.05$ from the two.sided test we can conclude that our results are not statistically significant. Therefore, we cannot reject the null hypothesis becuase p_val = 0.093 which is greater than 0.05. From this we cannot say that the mean of lifeExp is not equal to 60. 
+With a p-value cut-off of $\alpha = 0.05$ from the two.sided test we can conclude that our results are not statistically significant. Therefore, we cannot reject the null hypothesis because p_val = 0.093 which is greater than 0.05. From this we cannot say that the mean of lifeExp is not equal to 60. 
 
 ### Demonstrating a test of the hypothesis $$H_0 : \mu = 60,$$ $$H_a : \mu < 60.$$ 
 
@@ -54,7 +54,7 @@ With a p-value cut-off of $\alpha = 0.05$ from the two.sided test we can conclud
 my_t.test(x = life_exp, alternative = "less", mu = 60)
 ```
 
-With a p-value cut-off of $\alpha = 0.05$ from the one sided test with $H_a : \mu < 60$ we can conclude that our results are statistically significant. Therefore, we can reject the null hypothesis and have evidence to support our alternative hypothesis because the p_val = 0  < $\mu = 0.05$. From this we can say that the mean of lifeExp is less than 60.
+With a p-value cut-off of $\alpha = 0.05$ from the one sided test with $H_a : \mu < 60$ we can conclude that our results are statistically significant. Therefore, we can reject the null hypothesis and have evidence to support our alternative hypothesis because the p_val = 0  < $\mu = 0.05$.
 
 ### Demonstrating a test of the hypothesis $$H_0 : \mu = 60,$$ $$H_a : \mu > 60.$$ 
 
@@ -62,9 +62,10 @@ With a p-value cut-off of $\alpha = 0.05$ from the one sided test with $H_a : \m
 my_t.test(x = life_exp, alternative = "greater", mu = 60)
 ```
 
-With a p-value cut-off of $\alpha = 0.05$ from the one sided test with $H_a : \mu > 60$ we can conclude that our results are not statistically significant. Therefore, we cannot reject the null hypothesis becuase p_val = 1 which is greater than 0.05. .From this we cannot say that the mean of lifeExp greater than 60. 
+With a p-value cut-off of $\alpha = 0.05$ from the one sided test with $H_a : \mu > 60$ we can conclude that our results are not statistically significant. Therefore, we cannot reject the null hypothesis becuase p_val = 1 which is greater than 0.05.From this we cannot say that the mean of lifeExp greater than 60. 
 
 # my_lm Tutorial
+
 Demonstrating a regression of lifeExp as the response variable and gdpPercap and continent as the explanatory variables. 
 
 ```{r}
@@ -76,7 +77,7 @@ life_reg
 ```
 
 This table shows us the estimate, standard error, t-value and p-value of each coefficient. Let us interpret the gdpPercap coefficient. The estimate means that an increase of 1 in the gdpPercap means the lifeExp increases by `r life_reg[2, 1]`. The standard error is `r life_reg[2, 2]` which represents the average distance from the observed values of lifeExp from the regression line. To understand the last two values we need to understand the hypothesis test associated with the gdpPercap coefficient ($\beta$) which is: $$H_0 : \beta = 0$$ $$H_a : \beta \neq 0$$
-We test this hypothesis with a t-test like in the previous section in order to get the last two column values. This will tell us if we can reject the null hypothesis which says that the coefficient has no impact on lifeExp. The t-value is `r life_reg[2, 3]` which is $\frac{estimate - 0}{std. error}$, with which we find the p value `r life_reg[2, 4]`. With a significance value of $\alpha = 0.05$, we can reject the null hypothesis which says gdpPercap has no impact on lifeExp, because `r life_reg[2, 4]` $< 0.05$. 
+We test this hypothesis with a t-test, like in the previous section, in order to get the last two column values. This will tell us if we can reject the null hypothesis which says that the coefficient has no impact on lifeExp. The t-value is `r life_reg[2, 3]` which is $\frac{estimate - 0}{std. error}$, with which we find the p-value, `r life_reg[2, 4]`. With a significance value of $\alpha = 0.05$, we can reject the null hypothesis which says gdpPercap has no impact on lifeExp, because `r life_reg[2, 4]` $< 0.05$. 
 
 ```{r}
 # creating actual vs fitted plot data
@@ -109,10 +110,11 @@ ggplot(act_vs_fit, aes(x = Fitted, y = Actual, color = Continent)) +
 
 ```
 
-Looking at this graph of the actual lifeExp vs fitting lifeExp, we can see that the points are all clustered by their continent. Taking a look at the continent of Africa we see that fitted values are around 50 while the actual values have a broader range. This is the same among other continents, where the range of actual values is much greater than of the fitted values. This tells us that the variable, continent, plays a big role in the model. Since the variables in this model are continents and gdpPercap, we can conclude that the variation in fitted values by continent is due to gdpPercap. For example, Europe has a different range in fitted values than Asia because of gdgPercap. 
+Looking at this graph of the actual lifeExp vs fitting lifeExp, we can see that the points are all clustered by their continent. Taking a look at the continent of Africa we see that fitted values are around 50 while the actual values have a broader range. This is the same among other continents, where the range of actual values is much greater than of the fitted values. This tells us that the variable, continent, plays a big role in the model. Since the variables in this model are only continents and gdpPercap, we can conclude that the variation in fitted values by continent is due to gdpPercap. For example, Europe has a different range in fitted values than Asia because of gdgPercap. 
 
 # my_knn_cv Tutorial
-In this tutorial we will predict output class species using covariates bill_length_mm, flipper_length_mm, and body_mass_g. We will use a 5-fold cross validation, so k_cv $= 5$. We will iterate from k_nn $= 1, ..., 10$. 
+
+In this tutorial, we will predict output class species using covariates bill_length_mm, flipper_length_mm, and body_mass_g. We will use a 5-fold cross validation, so k_cv $= 5$. We will iterate from k_nn $= 1, ..., 10$. 
 
 ```{r}
 # cleaning data 
@@ -159,7 +161,7 @@ errors(10)
 
 ```
 
-The function my_knn_cv uses k-fold cross validation, and here we used a 5-fold cross validation. Cross validation is when we split data in k folds, use all but one fold as the training data and the one fold as the test data; in this one fold we find the mean squared error (MSE). We repeat this until all folds have been the test data, then we calculate the mean of all the MSEs to find our cross validation estimate (CV). We do this in order to properly evaluate the performance of estimator on data that was not used to train it. The table above shows the misclassification rates for k_nn 1 to 10. Based on the training misclassification rates I would chose the model where k_nn equals 1, and would chose the same based on CV misclassification rate. When the model is fitted using 1-nearest nieghbors both the CV and training misclassification rates are the lowest. In practice, we choose the model that has the lower CV error rate and then re-fit the model with the whole data. Therefore, in this case we choose the model with k_nn $= 1$.  
+The function my_knn_cv uses k-fold cross validation, and here we used a 5-fold cross validation. Cross validation is when we split data in k folds, use all but one fold as the training data and the one fold as the test data; in this one fold we find the mean squared error (MSE). We repeat this until all folds have been the test data, then we calculate the mean of all the MSEs to find our cross validation estimate (CV). We do this in order to properly evaluate the performance of estimator on data that was not used to train it. The table above shows the misclassification rates for k_nn 1 to 10. Based on the training misclassification rates I would chose the model where k_nn equals 1, and would chose the same based on CV misclassification rate. When the model is fitted using 1-nearest neighbors both the CV and training misclassification rates are the lowest. In practice, we choose the model that has the lower CV error rate and then re-fit the model with the whole data. Therefore, in this case we choose the model with k_nn $= 1$.  
 
 # my_rf_cv Tutorial
 
