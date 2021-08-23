@@ -17,19 +17,223 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-This package is a compilation of functions that run some statistical inferences and predictions that we have learned over the course of this class. The STAT302package includes functions my_t.test(), my_lm(), my_knn_cv, and my_rf_cv, as well as two sets of data my_penguins and my_gapminder from the gapminder and palmerpenguins packages. For statistical inference we have the function my_t.test that performs a one sample t-test and my_lm fits a linear model. For statistical prediction, other than my_lm, it has the my_knn_cv function that predicts an output class using covariates, and my_rf_cv, specific to the my_penguins data, which predicts output body_mass_g using covariates bill_length_mm, bill_depth_mm, and flipper_length_mm. In this vignette we will be using that data in order to demonstrate what this functions can do. 
+This package is a compilation of functions that run some statistical inferences and predictions that we have learned over the course of this class. The STAT302package includes functions my_t.test(), my_lm(), my_knn_cv, and my_rf_cv, as well as two sets of data my_penguins and my_gapminder from the gapminder and palmerpenguins packages. For statistical inference, we have the function my_t.test that performs a one sample t-test and my_lm fits a linear model. For statistical prediction, other than my_lm, it has the my_knn_cv function that predicts an output class using covariates, and my_rf_cv, specific to the my_penguins data, which predicts output body_mass_g using covariates bill_length_mm, bill_depth_mm, and flipper_length_mm. In this vignette we will be using that data in order to demonstrate what these functions can do. 
 
 Install STAT302package using:
 ```{r, eval = FALSE}
 devtools::install_github("kelsiosorio/STAT302package")
 ```
 
-```{r setup}
+Loading packages needed as well as the data
+```{r, message=FALSE}
 library(STAT302package)
+library(dplyr)
+library(ggplot2)
+data("my_gapminder")
+data("my_penguins") 
 ```
 
 # my_t.test Tutorial 
 
+```{r}
+# Creating a vector of lifeExp from my_gapminder for t-tests
+life_exp <- my_gapminder %>% pull(lifeExp)
+```
 
+### Demonstrating a test of the hypothesis $$H_0 : \mu = 60,$$ $$H_a : \mu \neq 60.$$ 
+
+```{r}
+my_t.test(x = life_exp, alternative = "two.sided", mu = 60)
+```
+
+With a p-value cut-off of $\alpha = 0.05$ from the two.sided test we can conclude that our results are not statistically significant. Therefore, we cannot reject the null hypothesis becuase p_val = 0.093 which is greater than 0.05. From this we cannot say that the mean of lifeExp is not equal to 60. 
+
+### Demonstrating a test of the hypothesis $$H_0 : \mu = 60,$$ $$H_a : \mu < 60.$$ 
+
+```{r}
+my_t.test(x = life_exp, alternative = "less", mu = 60)
+```
+
+With a p-value cut-off of $\alpha = 0.05$ from the one sided test with $H_a : \mu < 60$ we can conclude that our results are statistically significant. Therefore, we can reject the null hypothesis and have evidence to support our alternative hypothesis because the p_val = 0  < $\mu = 0.05$. From this we can say that the mean of lifeExp is less than 60.
+
+### Demonstrating a test of the hypothesis $$H_0 : \mu = 60,$$ $$H_a : \mu > 60.$$ 
+
+```{r}
+my_t.test(x = life_exp, alternative = "greater", mu = 60)
+```
+
+With a p-value cut-off of $\alpha = 0.05$ from the one sided test with $H_a : \mu > 60$ we can conclude that our results are not statistically significant. Therefore, we cannot reject the null hypothesis becuase p_val = 1 which is greater than 0.05. .From this we cannot say that the mean of lifeExp greater than 60. 
+
+# my_lm Tutorial
+Demonstrating a regression of lifeExp as the response variable and gdpPercap and continent as the explanatory variables. 
+
+```{r}
+# Fitting a linear model 
+
+life_reg <- my_lm(lifeExp ~ gdpPercap + continent, data = my_gapminder)
+life_reg
+
+```
+
+This table shows us the estimate, standard error, t-value and p-value of each coefficient. Let us interpret the gdpPercap coefficient. The estimate means that an increase of 1 in the gdpPercap means the lifeExp increases by `r life_reg[2, 1]`. The standard error is `r life_reg[2, 2]` which represents the average distance from the observed values of lifeExp from the regression line. To understand the last two values we need to understand the hypothesis test associated with the gdpPercap coefficient ($\beta$) which is: $$H_0 : \beta = 0$$ $$H_a : \beta \neq 0$$
+We test this hypothesis with a t-test like in the previous section in order to get the last two column values. This will tell us if we can reject the null hypothesis which says that the coefficient has no impact on lifeExp. The t-value is `r life_reg[2, 3]` which is $\frac{estimate - 0}{std. error}$, with which we find the p value `r life_reg[2, 4]`. With a significance value of $\alpha = 0.05$, we can reject the null hypothesis which says gdpPercap has no impact on lifeExp, because `r life_reg[2, 4]` $< 0.05$. 
+
+```{r}
+# creating actual vs fitted plot data
+# isolating X
+mat_X <- model.matrix(lifeExp ~ gdpPercap + continent, data = my_gapminder)
+# isolating betas
+mat_b <- life_reg %>% pull(Estimate)
+# creating fitted values
+mat_fitted <- mat_X %*% mat_b
+# creating data frame with continent, fitted, and actual values
+act_vs_fit <- data.frame("Continent" = my_gapminder$continent,
+                         "Fitted" = mat_fitted,
+                         "Actual" = my_gapminder$lifeExp)
+
+```
+
+```{r, fig.height = 5, fig.width=8}
+# creating actual vs fitted plot
+ggplot(act_vs_fit, aes(x = Fitted, y = Actual, color = Continent)) +
+  geom_point() +
+  # resizing font 
+  theme_bw(base_size = 15) +
+  # changing labels
+  labs(title = "Actual vs. Fitted") +
+  # adjusting placement
+  theme(plot.title =
+          element_text(hjust = 0.5),
+         plot.caption =
+           element_text(hjust = 0))
+
+```
+
+Looking at this graph of the actual lifeExp vs fitting lifeExp, we can see that the points are all clustered by their continent. Taking a look at the continent of Africa we see that fitted values are around 50 while the actual values have a broader range. This is the same among other continents, where the range of actual values is much greater than of the fitted values. This tells us that the variable, continent, plays a big role in the model. Since the variables in this model are continents and gdpPercap, we can conclude that the variation in fitted values by continent is due to gdpPercap. For example, Europe has a different range in fitted values than Asia because of gdgPercap. 
+
+# my_knn_cv Tutorial
+In this tutorial we will predict output class species using covariates bill_length_mm, flipper_length_mm, and body_mass_g. We will use a 5-fold cross validation, so k_cv $= 5$. We will iterate from k_nn $= 1, ..., 10$. 
+
+```{r}
+# cleaning data 
+data_clean <- na.omit(my_penguins %>% select(species, bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g))
+
+# filtering for training data
+p_train <- data_clean %>% select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g)
+
+```
+
+```{r}
+# errors(): function that creates data frame with training misclasssification errors 
+# and CV missclassification rate for multiple iterations of k_nn for data above
+# input: the highest k_nn = j
+# output: data frame
+errors <- function(j) {
+  # initializing data frames
+  cv_err_df <- data.frame()
+  train_err_df <- data.frame()
+  # iteration of k_nn 1 to j
+  for (i in 1:j) {
+    ## running my_knn_cv
+    ## Here is where we used my_knn_cv to predict class and find CV_MSE
+    knn <- my_knn_cv(p_train, data_clean$species, i, 5)
+    # Adding cv_error to table
+    cv_err_df <- rbind(cv_err_df, i = knn[["cv_err"]])
+    # finding training error 
+    train_err <- mean(ifelse(knn[["class"]] == data_clean$species, 0, 1))
+    # adding training error to data frame
+    train_err_df <- rbind(train_err_df, i = train_err)
+  }
+  # cbind tables
+  error_tab <- cbind(cv_err_df, train_err_df)
+  colnames(error_tab) <- c("CV misclassification rate", "training misclassification rate")
+  rownames(error_tab) <- c(1:j)
+  return(error_tab)
+}
+
+```
+
+```{r}
+# iterating for k_nn 1 to 10
+errors(10)
+
+```
+
+The function my_knn_cv uses k-fold cross validation, and here we used a 5-fold cross validation. Cross validation is when we split data in k folds, use all but one fold as the training data and the one fold as the test data; in this one fold we find the mean squared error (MSE). We repeat this until all folds have been the test data, then we calculate the mean of all the MSEs to find our cross validation estimate (CV). We do this in order to properly evaluate the performance of estimator on data that was not used to train it. The table above shows the misclassification rates for k_nn 1 to 10. Based on the training misclassification rates I would chose the model where k_nn equals 1, and would chose the same based on CV misclassification rate. When the model is fitted using 1-nearest nieghbors both the CV and training misclassification rates are the lowest. In practice, we choose the model that has the lower CV error rate and then re-fit the model with the whole data. Therefore, in this case we choose the model with k_nn $= 1$.  
+
+# my_rf_cv Tutorial
+
+We are going to predict body_mass_g using covariates bill_length_mm, bill_depth_mm, and flipper_length_mm. We are going to iterate k in c(2, 5, 10), each value for 30 times 
+
+```{r}
+# rf_errors(): function that creates data frame CV_MSE for a couple iterations of my_rf_cv
+# input: k like in my_rf_cv and j iterations
+# output: data frame with CV_MSEs for k
+rf_errors <- function(k, j) {
+  # initializing data frames
+  rf_mse <- data.frame()
+  # iteration of my_rf_cv 1 to j
+  for (i in 1:j) {
+    ## running my_rf_cv
+    ## Here is where we used my_rf_cv to predict class
+    k_rf_val <- my_rf_cv(k)
+    # Adding CV_MSE to table
+    rf_mse<- rbind(rf_mse, i = k_rf_val)
+  }
+  # adding fold label to output data frame
+  label <- data.frame(matrix(NA, nrow = j, ncol = 1))
+  label[, 1] <- rep(as.character(c(k)), each = j)
+  # creating output data frame and adding labels
+  mse <- cbind(label, rf_mse)
+  colnames(mse) <- c("fold", "CV_MSE")
+  return(mse)
+}
+
+```
+
+```{r}
+# making tables with 30 iterations of each fold
+set.seed(93)
+k_2 <- rf_errors(2, 30)
+k_5 <- rf_errors(5, 30)
+k_10 <- rf_errors(10, 30)
+
+# Creating data frame with all three where fold is a classification
+all_cv_mse <- rbind(k_2, k_5, k_10)
+
+```
+
+Let's create some graphs to display this data in a more informative way. 
+
+```{r, fig.width=8, fig.height=5}
+# boxplot of each fold representing distribution of the 30 simulation
+ggplot(data = all_cv_mse, aes(x = fold, y = CV_MSE)) + 
+  geom_boxplot() +
+  # resizing font 
+  theme_bw(base_size = 15) +
+  # changing labels
+  labs(title = "CV_MSE distrubutions of 30 simulations of my_rf_cv by folds",
+       x = "folds",
+       y = "CV estimated MSE") +
+  # adjusting placement
+  theme(plot.title =
+          element_text(hjust = 0.5),
+         plot.caption =
+           element_text(hjust = 0))
+
+```
+
+```{r}
+sd_mean_df <- data.frame("Avg CV estimate" = c(colMeans(k_2 %>% select(CV_MSE)), 
+                                   colMeans(k_5 %>% select(CV_MSE)),
+                                   colMeans(k_10 %>% select(CV_MSE))),
+                        "Std dev of CV estimates" = c(sd(k_2 %>% pull(CV_MSE)),
+                                 sd(k_5 %>% pull(CV_MSE)),
+                                 sd(k_10 %>% pull(CV_MSE))))
+rownames(sd_mean_df) <- c("2 folds", "5 folds", "10 folds")
+sd_mean_df
+```
+
+By looking at just the box plots we see that as we increase the values of k, the number of folds, the range of the CV estimated MSEs gets smaller. From the table we see that the averate CV estimate get smaller as k is increased, and the standard deviations of the CV estimates also decreases. The reason why increasing the number of folds decreases the CV MSE might be because as the number of folds increases we begin to over fit the data. As mentioned in the previous section, the point of cross validation is to test the model on data that we did not use to train it; however, as we increase the folds we may give single values to much power over the whole model. This may be why we see a decrease in the CV_MSE and in the variation.    
 
 
